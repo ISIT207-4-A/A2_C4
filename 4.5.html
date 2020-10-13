@@ -41,8 +41,11 @@
                 string += i;
                 string += ' style = "top: ';
                 string += i*10 + 10;
-                string += 'px"  />';
+                string += 'px; background-color: ';
+                string += getRandomColor();
+                string += ';" />'
                 $('body').append(string);
+
 
             }
 
@@ -56,6 +59,15 @@
 
             }
         });
+        function getRandomColor(){
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+
+        }
 
     </script>
 </head>
@@ -65,7 +77,7 @@
 
 <style>
     div{
-        background-color: #999999;
+
         height:100px; width:200px; position:absolute; left: 0px;transform: rotate(0deg);
         animation: rotation 8s infinite linear;
     }
