@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        var slideDir = "right";
+
+        var j = 0;
+        function slideRight(div){
+            j++;
+            slideDir = "right";
+
+            let rot = "rotate(" + $(div).attr("layer")+j + "deg)";
+            $(div).css("transform", rot);
+
+            let speed = $(div).attr("layer")*500;
+            $(div).animate({left:"2000px"}, speed, function() {
+                slideLeft(div);
+            });
+        }
+
+        function slideLeft(div){
+            j++;
+            slideDir = "left";
+
+            let rot = "rotate(" + $(div).attr("layer")+j + "deg)";
+            $(div).css("transform", rot);
+
+            let speed = $(div).attr("layer")*500;
+            $(div).animate({left:"0px"}, speed, function() {
+                slideRight(div);
+            });
+        }
+
+        $(document).ready(function(){
+            for (i = 1; i < 401; i++) {
+                let string = '<div id ="div';
+                string += i;
+                string += '" ';
+                string += "layer = ";
+                string += i;
+                string += ' style = "top: ';
+                string += i*10 + 10;
+                string += 'px"  />';
+                $('body').append(string);
+
+            }
+
+
+            for (i = 1; i <= 400; i++) {
+                let div = "#div" + i;
+                if (slideDir == "right")
+                    slideRight(div);
+                else
+                    slideLeft(div);
+
+            }
+        });
+
+    </script>
+</head>
+<body>
+
+
+
+<style>
+    div{
+        background-color: #999999;
+        height:100px; width:200px; position:absolute; left: 0px;transform: rotate(0deg);
+        animation: rotation 8s infinite linear;
+    }
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    }
+</style>
+</body>
+</html>
