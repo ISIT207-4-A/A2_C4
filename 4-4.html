@@ -8,6 +8,7 @@
                 background-color: #121215;
             }
 
+            /* outer div (container) */
             .solar-system {
                 position: relative;
                 width: 700px;
@@ -16,22 +17,19 @@
                 overflow: hidden;
             }
 
-            /* Some positioning rules that are common for all objects */
+            /* orbit properties */
             .orbit {
                 border: 1px dashed #666;
             }
 
-            #sun, .orbit, .orbit + div, .orbit + div > div {
+            .orbit, .orbit + div, .orbit + div > div {
                 position: absolute;
             }
 
-            #sun, .orbit, .orbit + div {
-                top: 50%;
-                left: 50%;
-            }
-            .orbit + div > div {
-                top: 0;
-                left: 50%;
+            .orbit, .orbit + div {
+                margin-left: 100px;
+                margin-top: 100px; 
+
             }
 
             .orbit, .orbit + div div, #earth {
@@ -39,20 +37,19 @@
             }
 
 
-            /* Individual objects rules. They are pretty much the same for 
-            all objects and basically only vary in orbit size 
-            and planet size. And colors :) */
-
+            /* sun' position properties so that it is at the center */
             #sun {
-                /* Positions the top-left corner of the image to be *
-                /* in the middle of the box */
+                position: absolute;
+                top: 50%;
+                left: 50%;
                 height: 200px;
                 width: 200px;
                 margin-top: -100px; 
                 margin-left: -100px;
-
             }
 
+
+            /* earth's image properties and position */
             #earth {
                 position: absolute;
                 top: 0;
@@ -63,11 +60,25 @@
                 margin-top: -25px;    
             }
 
-            .earth-orbit, .earth-spin {
+            /* the div wraps around sun that will be rotated 
+            to make earth rotates around sun */ 
+            .earth-spin {
+                position: relative;
+                
                 width: 500px;
                 height: 500px;
-                margin-left: -250px;
-                margin-top: -250px;   
+                margin-left: 100px;
+                margin-top: 100px;   
+            }
+
+            /* earth orbit's position properties */
+            .earth-orbit {
+                position: absolute;
+                
+                width: 500px;
+                height: 500px;
+                margin-right: -100px;
+                margin-bottom: -100px;   
             }
 
 
@@ -75,53 +86,56 @@
 
             /* Spinning animations */
 
-            @keyframes spin-right {
+            /* rotate the earth's outer div 360 deg each loop */
+            @keyframes spin-around-sun {
                 100% {
                     transform: rotate(360deg);
                 }
             }
 
-            @keyframes sun-spin-around {
+            /* rotate the sun around its center 180 deg each loop */
+            @keyframes sun-spin-around-center {
                 100% {
                     transform: rotate(180deg);
                 }
             }
 
+            /* animation classes */
             .earth-spin {
-                animation: spin-right 36.5s linear infinite;
+                animation: spin-around-sun 36.5s linear infinite;
             }
 
             .sun-spin {
-                animation: sun-spin-around 10s linear infinite;
+                animation: sun-spin-around-center 10s linear infinite;
             }
 
         </style>
 
         <script>
             $(document).ready(function () {
-
                 var earthRotateTime = 36.5;
-                $(".solar-system").click(function() {
-                    console.log(1);
-                    earthRotateTime -= 1;
-                    let temp = "spin-right " + earthRotateTime + "s linear infinite"
-                    $(".earth-spin").css("animation", temp);
+
+                $("#sun").bind("click", function() {
+                    if (earthRotateTime -1 > 1) {
+                        earthRotateTime -= 1;
+                        let temp = "spin-around-sun " + earthRotateTime + "s linear infinite"
+                        $(".earth-spin").css("animation", temp);
+                    }
                 });
 
             });
-           
-            
         </script>
     </head>
     <body> 
 
         <div class="solar-system">
-            <div id="sun-div"><img src="images/sun.png" id="sun" class="sun-spin"/></div>
 
             <div class="orbit earth-orbit"></div>
+            
             <div class="earth-spin">
                 <img id="earth" src="images/earth.png" />
             </div>
+            <img id="sun" class="sun-spin" src="images/sun.png"  />
         </div>
 
     </body>
