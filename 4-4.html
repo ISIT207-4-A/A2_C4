@@ -93,10 +93,10 @@
                 }
             }
 
-            /* rotate the sun around its center 180 deg each loop */
+            /* rotate the sun around its center 360 deg each loop */
             @keyframes sun-spin-around-center {
                 100% {
-                    transform: rotate(180deg);
+                    transform: rotate(360deg);
                 }
             }
 
@@ -106,7 +106,7 @@
             }
 
             .sun-spin {
-                animation: sun-spin-around-center 10s linear infinite;
+                animation: sun-spin-around-center 20s linear infinite;
             }
 
         </style>
