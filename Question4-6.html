@@ -1,0 +1,332 @@
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>ttt</title>
+	<style>
+		td {
+			width: 50px;
+			height: 50px;
+			font-size: 50px;
+			font-family: monospace;
+			border: 1px solid lightGrey;
+			text-align: center;
+			color: red;
+		}
+
+		.server {
+			color: blue;
+		}
+
+		body {
+			font-family: Helvetica;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Tic-tac-toe: <br>server "X" vs. client "O"</h1>
+
+	<button id="new">New game</button>
+	<button id="server">Server play</button>
+
+	<table>
+		<tr>
+			<td id="cell-1">&nbsp;</td>
+			<td id="cell-2">&nbsp;</td>
+			<td id="cell-3">&nbsp;</td>
+		</tr>
+		<tr>
+			<td id="cell-4">&nbsp;</td>
+			<td id="cell-5">&nbsp;</td>
+			<td id="cell-6">&nbsp;</td>
+		</tr>
+		<tr>
+			<td id="cell-7">&nbsp;</td>
+			<td id="cell-8">&nbsp;</td>
+			<td id="cell-9">&nbsp;</td>
+		</tr>
+
+	</table>
+
+
+	<script>
+
+		var ttt = {
+			// cells played so far
+			played: [],
+
+			
+			full: [[0, 0, 0], [0, 0, 0], [0, 0, 0]],//0 means null,1 means server,2 means client
+			val: [[1, 1, 1], [1, 1, 1], [1, 1, 1]],//the weight for each position
+
+			gameOverFlag: false,  //End of game sign
+
+			judge: function () {
+				//check who wins
+				//row
+				for (var i = 0; i < 3; i++) {
+					if (this.full[i][0] == this.full[i][1] && this.full[i][1] == this.full[i][2] && this.full[i][0] != 0) {
+						if (this.full[i][0] == 2) {
+							alert("you win!");
+							return true;
+						}
+						else {
+							alert("you lose");
+							return true;
+						}
+					}
+				}
+				//column
+				for (var i = 0; i < 3; i++) {
+					if (this.full[0][i] == this.full[1][i] && this.full[1][i] == this.full[2][i] && this.full[0][i] != 0) {
+						if (this.full[0][i] == 2) {
+							alert("you win!");
+							return true;
+						}
+						else {
+							alert("you lose");
+							return true;
+						}
+					}
+				}
+				//Leading diagonal
+				if (this.full[0][0] == this.full[1][1] && this.full[1][1] == this.full[2][2] && this.full[0][0] != 0) {
+					if (this.full[0][0] == 2) {
+						alert("you win!");
+						return true;
+					}
+					else {
+						alert("you lose");
+						return true;
+					}
+				}
+				if (this.full[0][2] == this.full[1][1] && this.full[2][0] == this.full[1][1] && this.full[0][2] != 0) {
+					if (this.full[0][2] == 2) {
+						alert("you win!");
+						return true;
+					}
+					else {
+						alert("you lose");
+						return true;
+					}
+				}
+				for (var i = 0; i < 3; i++) {
+					for (var j = 0; j < 3; j++) {
+						if (this.full[i][j] == 0)
+							return false;//It hasn't finished
+						if (i == 2 && j == 2) {
+							alert("Draw！");
+							return true;
+						}
+					}
+				}
+				return false;//No result
+			},
+
+			//Reset the weight：
+			resetValue: function () {
+				for (var i = 0; i < 3; i++) {
+					for (var j = 0; j < 3; j++) {
+						if (this.full[i][j] != 0)
+							this.val[i][j] = 0;
+						else {
+							//Look at the row and column：  
+							//The highest weight
+							if (((this.full[0][j] + this.full[1][j] + this.full[2][j]) == 4) && (this.full[0][j] * this.full[1][j] * this.full[2][j]) == 0
+								&& ((this.full[0][j] - 1) * (this.full[1][j] - 1) * (this.full[2][j] - 1)) == -1)
+								this.val[i][j] = this.val[i][j] + 10000;
+							if (((this.full[i][0] + this.full[i][1] + this.full[i][2]) == 4) && (this.full[i][0] * this.full[i][1] * this.full[i][2]) == 0
+								&& ((this.full[i][0] - 1) * (this.full[i][1] - 1) * (this.full[i][2] - 1)) == -1)
+								this.val[i][j] = this.val[i][j] + 10000;
+							//The second highest weight
+							if (((this.full[0][j] + this.full[1][j] + this.full[2][j]) == 2) && (this.full[0][j] * this.full[1][j] * this.full[2][j]) == 0
+								&& ((this.full[0][j] - 1) * (this.full[1][j] - 1) * (this.full[2][j] - 1)) == 0)
+								this.val[i][j] = this.val[i][j] + 1000;
+							if (((this.full[i][0] + this.full[i][1] + this.full[i][2]) == 2) && (this.full[i][0] * this.full[i][1] * this.full[i][2]) == 0
+								&& ((this.full[i][0] - 1) * (this.full[i][1] - 1) * (this.full[i][2] - 1)) == 0)
+								this.val[i][j] = this.val[i][j] + 1000;
+							//The third highest weight(only one X in one line)
+							if (((this.full[0][j] + this.full[1][j] + this.full[2][j]) == 1) && (this.full[0][j] * this.full[1][j] * this.full[2][j]) == 0
+								&& ((this.full[0][j] - 1) * (this.full[1][j] - 1) * (this.full[2][j] - 1)) == 0)
+								this.val[i][j] = this.val[i][j] + 10;
+							if (((this.full[i][0] + this.full[i][1] + this.full[i][2]) == 1) && (this.full[i][0] * this.full[i][1] * this.full[i][2]) == 0
+								&& ((this.full[i][0] - 1) * (this.full[i][1] - 1) * (this.full[i][2] - 1)) == 0)
+								this.val[i][j] = this.val[i][j] + 10;
+							//The fourth highest weight(only one O in one line)
+							if (((this.full[0][j] + this.full[1][j] + this.full[2][j]) == 2) && (this.full[0][j] * this.full[1][j] * this.full[2][j]) == 0
+								&& ((this.full[0][j] - 1) * (this.full[1][j] - 1) * (this.full[2][j] - 1)) == 1)
+								this.val[i][j] = this.val[i][j] + 5;
+							if (((this.full[i][0] + this.full[i][1] + this.full[i][2]) == 2) && (this.full[i][0] * this.full[i][1] * this.full[i][2]) == 0
+								&& ((this.full[i][0] - 1) * (this.full[i][1] - 1) * (this.full[i][2] - 1)) == 1)
+								this.val[i][j] = this.val[i][j] + 5;
+							//The fifth highest weight(No X or O in one line)
+							if (((this.full[0][j] + this.full[1][j] + this.full[2][j]) == 0) && (this.full[0][j] * this.full[1][j] * this.full[2][j]) == 0
+								&& ((this.full[0][j] - 1) * (this.full[1][j] - 1) * (this.full[2][j] - 1)) == -1)
+								this.val[i][j] = this.val[i][j] + 2;
+							if (((this.full[i][0] + this.full[i][1] + this.full[i][2]) == 0) && (this.full[i][0] * this.full[i][1] * this.full[i][2]) == 0
+								&& ((this.full[i][0] - 1) * (this.full[i][1] - 1) * (this.full[i][2] - 1)) == -1)
+								this.val[i][j] = this.val[i][j] + 2;
+							//Leading diagonal：ditto
+							if ((i == 0 && j == 0) || (i == 2 && j == 2) || (i == 1 && j == 1)) {
+								if (((this.full[0][0] + this.full[1][1] + this.full[2][2]) == 4) && (this.full[0][0] * this.full[1][1] * this.full[2][2]) == 0
+									&& ((this.full[0][0] - 1) * (this.full[1][1] - 1) * (this.full[2][2] - 1)) == -1)
+									this.val[i][j] = this.val[i][j] + 10000;
+								//The second highest weight
+								if (((this.full[0][0] + this.full[1][1] + this.full[2][2]) == 2) && (this.full[0][0] * this.full[1][1] * this.full[2][2]) == 0
+									&& ((this.full[0][0] - 1) * (this.full[1][1] - 1) * (this.full[2][2] - 1)) == 0)
+									this.val[i][j] = this.val[i][j] + 1000;
+								//The third highest weight(only one X on the line)
+								if (((this.full[0][0] + this.full[1][1] + this.full[2][2]) == 1) && (this.full[0][0] * this.full[1][1] * this.full[2][2]) == 0
+									&& ((this.full[0][0] - 1) * (this.full[1][1] - 1) * (this.full[2][2] - 1)) == 0)
+									this.val[i][j] = this.val[i][j] + 10;
+								//The fourth highest weight(only one O on the line)
+								if (((this.full[0][0] + this.full[1][1] + this.full[2][2]) == 2) && (this.full[0][0] * this.full[1][1] * this.full[2][2]) == 0
+									&& ((this.full[0][0] - 1) * (this.full[1][1] - 1) * (this.full[2][2] - 1)) == 1)
+									this.val[i][j] = this.val[i][j] + 5;
+								//The fifth highest weight(No X or O)
+								if (((this.full[0][0] + this.full[1][1] + this.full[2][2]) == 0) && (this.full[0][0] * this.full[1][1] * this.full[2][2]) == 0
+									&& ((this.full[0][0] - 1) * (this.full[1][1] - 1) * (this.full[2][2] - 1)) == -1)
+									this.val[i][j] = this.val[i][j] + 2;
+							}
+							//counter-diagonal:ditto
+							if ((i == 0 && j == 2) || (i == 2 && j == 0) || (i == 1 && j == 1)) {
+								//The first highest weight
+								if (((this.full[0][2] + this.full[1][1] + this.full[2][0]) == 4) && (this.full[0][2] * this.full[1][1] * this.full[2][0]) == 0
+									&& ((this.full[0][2] - 1) * (this.full[1][1] - 1) * (this.full[2][0] - 1)) == -1)
+									this.val[i][j] = this.val[i][j] + 10000;
+								//The second highest weight
+								if (((this.full[0][2] + this.full[1][1] + this.full[2][0]) == 2) && (this.full[0][2] * this.full[1][1] * this.full[2][0]) == 0
+									&& ((this.full[0][2] - 1) * (this.full[1][1] - 1) * (this.full[2][0] - 1)) == 0)
+									this.val[i][j] = this.val[i][j] + 1000;
+								//The third highest weight(only one X on the line)
+								if (((this.full[0][2] + this.full[1][1] + this.full[2][0]) == 1) && (this.full[0][2] * this.full[1][1] * this.full[2][0]) == 0
+									&& ((this.full[0][2] - 1) * (this.full[1][1] - 1) * (this.full[2][0] - 1)) == 0)
+									this.val[i][j] = this.val[i][j] + 10;
+								//The fourth highest weight(only one O on the line)
+								if (((this.full[0][2] + this.full[1][1] + this.full[2][0]) == 2) && (this.full[0][2] * this.full[1][1] * this.full[2][0]) == 0
+									&& ((this.full[0][2] - 1) * (this.full[1][1] - 1) * (this.full[2][0] - 1)) == 1)
+									this.val[i][j] = this.val[i][j] + 5;
+								//The fifth highest weight(No X or O on the line)
+								if (((this.full[0][2] + this.full[1][1] + this.full[2][0]) == 0) && (this.full[0][2] * this.full[1][1] * this.full[2][0]) == 0
+									&& ((this.full[0][2] - 1) * (this.full[1][1] - 1) * (this.full[2][0] - 1)) == -1)
+									this.val[i][j] = this.val[i][j] + 2;
+							}
+						}
+					}
+				}
+			},
+
+			ai: function () {
+				//Pick one with the highest weight
+				ttt.resetValue();
+				var mi = 0, mj = 0, temp = 0;
+				for (var i = 0; i < 3; i++)
+					for (var j = 0; j < 3; j++) {
+						if (this.val[i][j] > temp) {
+							temp = this.val[i][j];
+							mi = i;
+							mj = j;
+						}
+					}
+				num1 = (mi * 3 + mj + 1) + "";
+				ttt.get('cell-' + num1).innerHTML = 'O';
+				this.played.push(num1);
+				this.full[mi][mj] = 2;
+				setTimeout(function () {
+					if (ttt.judge() == true) {
+						this.gameOverFlag = true;
+					}
+				}, 300);
+			},
+
+			// shorthand
+			get: function (id) {
+				return document.getElementById(id);
+			},
+
+			// handle clicks
+			setup: function () {
+				this.get('new').onclick = this.newGame;
+				this.get('server').onclick = this.remoteRequest;
+			},
+
+			// clean the board
+			newGame: function () {
+				var tds = document.getElementsByTagName("td"),
+					max = tds.length,
+					i;
+				for (i = 0; i < max; i += 1) {
+					tds[i].innerHTML = "&nbsp;";
+				}
+				ttt.played = [];
+				ttt.full = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+				ttt.resetValue();
+				ttt.gameOverFlag = false;
+			},
+
+			// make a request
+			remoteRequest: function () {
+				var script = document.createElement("script");
+				script.src = "http://www.jspatterns.com/book/8/server.php?callback=ttt.serverPlay&played=" + ttt.played.join(',');
+				document.body.appendChild(script);
+			},
+
+			// callback, server's turn to play
+			serverPlay: function (data) {
+				if (this.gameOverFlag == true || this.played.length == 9) {
+					alert("Game over");
+					return;
+				}
+				if (data.error) {
+					alert(data.error);
+					return;
+				}
+				data = parseInt(data, 10);
+				this.played.push(data);
+				let row, col;
+				if (data == 0) {
+					x = 0, col = 0;
+				} else {
+					if (data % 3 == 0) {
+						row = data / 3 - 1;
+						col = 2;
+					} else {
+						row = (data - data % 3) / 3;
+						col = data % 3 - 1;
+					}
+				}
+				this.full[row][col] = 1;
+				console.log("server index=" + data + ",row=" + row + ",col=" + col)
+				this.get('cell-' + data).innerHTML = '<span class="server">X<\/span>';
+
+				setTimeout(function () {
+					ttt.clientPlay();
+				}, 300); // as if thinking hard
+
+			},
+
+			// client's turn to play
+			clientPlay: function () {
+				var data = 5;
+
+				if (this.played.length === 9) {
+					alert("Game over");
+					return;
+				}
+
+				// keep coming up with random numbers 1-9 
+				// until one not taken cell is found
+				ttt.ai();
+			}
+
+		};
+
+		ttt.setup();
+
+	</script>
+
+</body>
+
+</html>
