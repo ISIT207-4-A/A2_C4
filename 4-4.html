@@ -82,48 +82,39 @@
             }
 
 
-
-
-            /* Spinning animations */
-
-            /* rotate the earth's outer div 360 deg each loop */
-            @keyframes spin-around-sun {
-                100% {
-                    transform: rotate(360deg);
-                }
-            }
-
-            /* rotate the sun around its center 360 deg each loop */
-            @keyframes sun-spin-around-center {
-                100% {
-                    transform: rotate(360deg);
-                }
-            }
-
-            /* animation classes */
-            .earth-spin {
-                animation: spin-around-sun 36.5s linear infinite;
-            }
-
-            .sun-spin {
-                animation: sun-spin-around-center 20s linear infinite;
-            }
-
         </style>
 
         <script>
-            $(document).ready(function () {
-                var earthRotateTime = 36.5;
+            var sunRotate = 0; 			
+            var earthRotate = 0; 			
+            var earthSpeed = 10;
 
-                $("#sun").bind("click", function() {
-                    if (earthRotateTime -1 > 1) {
-                        earthRotateTime -= 1;
-                        let temp = "spin-around-sun " + earthRotateTime + "s linear infinite"
-                        $(".earth-spin").css("animation", temp);
-                    }
+            //sun rotates around itselft		 			
+            function rotateSun() { 				
+                $("#sun").css({'transform': 'rotate(' + sunRotate + 'deg)'}); 				
+                sunRotate++; 			
+
+                //setTimeout for function recursion, calling this function after a fixed time
+                setTimeout(rotateSun, 10); 			
+            } 			 			
+            
+            function rotateEarth() { 				
+                $(".earth-spin").css({'transform': 'rotate(' + earthRotate + 'deg)'}); 				
+                earthRotate++;
+
+                //setTimeout for function recursion, calling this function in smaller time
+                //each time pressed on the sun so that the earth moves faster
+                setTimeout(rotateEarth, earthSpeed); 			
+            } 			
+            rotateSun();
+            rotateEarth();
+            
+            $(document).ready(function() {
+                $("#sun").click(function() {
+                    earthSpeed = earthSpeed * 0.9;
+                    console.log(earthSpeed);
                 });
-
-            });
+            })
         </script>
     </head>
     <body> 
